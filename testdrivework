@@ -1,14 +1,19 @@
-@TeleOp(name="testdrivework", group="Iterative Opmode")
-public class testdrivework extends OpMode {
+@TeleOp(name="Teleop", group="Iterative Opmode")
+public class Teleop extends OpMode{
+
     double leftDrivePower = 0;
     double rightDrivePower = 0;
-    boolean changed = false;
+    double pulleyPower = 0;
+    double top = 0;
+   // boolean changed = false;
 
 
     public DcMotor leftSide1;       // wheels
     public DcMotor leftSide2;
     public DcMotor rightSide1;
     public DcMotor rightSide2;
+    public DcMotor topwheel;
+    public DcMotor arm;
     public Servo intake1;
     public Servo intake2;
 
@@ -26,6 +31,10 @@ public class testdrivework extends OpMode {
         intake1 = hardwareMap.servo.get("intake1");
         intake2 = hardwareMap.servo.get("intake2");
 
+
+        topwheel = hardwareMap.dcMotor.get("topwheel");
+        arm = hardwareMap.dcMotor.get("arm");
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");
 
@@ -40,22 +49,62 @@ public class testdrivework extends OpMode {
         leftDrivePower = gamepad1.left_stick_y + gamepad1.left_stick_x;
         rightDrivePower = gamepad1.left_stick_y - gamepad1.left_stick_x;
 
-        //opencloseservos
-        if (gamepad2.y && !changed) {
-            if (intake1.getPosition() == 0)
-                intake1.setPosition(1);
-            else {
-                intake1.setPosition(0);
-            }
+//topwheel
+
+        if (Math.abs(gamepad1.left_trigger) > .1) {
+            top = -1;
+
+        } else if (Math.abs(gamepad2.right_trigger) > .1) {
+            top = 1;
+
+        } else {
+            top = 0;
 
         }
-        if (gamepad2.y && !changed) {
+
+        //gamepad 2
+      /*  if (gamepad2.y && !changed) {
             if (intake2.getPosition() == 0)
                 intake2.setPosition(1);
             else {
                 intake2.setPosition(0);
             }
 
+            if (gamepad2.y && !changed) {
+                if (intake1.getPosition() == 0)
+                    intake1.setPosition(1);
+                else {
+                    intake1.setPosition(0);
+                }
+
+            }
+
+
+       */
+//claw
+        if (gamepad2.a) {
+            intake1.setPosition(1);
+            intake2.setPosition(1);
+        }
+
+
+        if (gamepad2.b) {
+
+            if (gamepad1.x) {
+                intake1.setPosition(0);
+                intake2.setPosition(0);
+            }
+//arm
+            if (Math.abs(gamepad2.left_trigger) > .1) {
+                pulleyPower = -1;
+
+            } else if (Math.abs(gamepad2.right_trigger) > .1) {
+                pulleyPower = 1;
+
+            } else {
+                pulleyPower = 0;
+
+            }
 
             // initializing powers
             leftSide1.setPower(leftDrivePower);
@@ -63,7 +112,14 @@ public class testdrivework extends OpMode {
             rightSide1.setPower(rightDrivePower);
             rightSide2.setPower(rightDrivePower);
 
+            arm.setPower(pulleyPower*0.5);
+
+
+
+
         }
+
+
 
     }
 
